@@ -1,0 +1,52 @@
+---
+name: Test and Lint
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+
+
+jobs:
+  tox:
+    name: Run unit tests and linters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+    #   - name: Install dependencies
+    #     run: |
+    #       uv sy
+
+      - name: Install external tools
+        run: |
+          NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          /home/linuxbrew/.linuxbrew/bin/brew install hadolint oras
+          sudo ln -s /home/linuxbrew/.linuxbrew/bin/hadolint /usr/bin/
+          pip install tox
+
+      - name: Run Tests
+        run: |
+            uv tool install tox --with tox-uv --force
+            uv run tox
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  commitlint:
+    name: Conventional Commit Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+
+      - uses: webiny/action-conventional-commits@v1.3.0
