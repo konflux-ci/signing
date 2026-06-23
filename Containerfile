@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ubi10@sha256:b9e5730d0b6dba45e82c15fb8f49c6082e01cdcb5e4f6ba96535dab42a4d2cf0
+FROM registry.redhat.io/ubi10@sha256:116d8cffea1e453e56e0aa5d33253c6d376bc770e4645770a8e73c63d9f7e320
 
 LABEL name="konflux-signing" \
     description="An image for signing and verifying software artifacts" \
